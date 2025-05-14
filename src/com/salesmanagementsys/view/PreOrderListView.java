@@ -1,0 +1,493 @@
+package com.salesmanagementsys.view;
+
+import org.eclipse.swt.*;
+
+
+import org.eclipse.swt.widgets.*;
+import org.eclipse.swt.layout.*;
+import com.salesmanagementsys.controller.PreOrderController;
+import com.salesmanagementsys.model.PreOrder;
+import com.salesmanagementsys.model.Customer;
+import com.salesmanagementsys.model.Staff;
+import java.util.List;
+import java.util.ArrayList;
+import java.sql.SQLException;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import java.util.Calendar;
+import com.salesmanagementsys.model.DatabaseManager;
+
+
+public class PreOrderListView {
+    private Composite composite;
+    private Table preOrderTable;
+    private PreOrderController controller;
+    private static final int MARGIN = 10;
+    private static final int SPACING = 5;    
+    private Table itemDetailsTable;
+    private Group itemDetailsGroup;
+    private Button markAsPaidButton;
+    private Button editButton;
+    private Button deleteButton;
+    
+    // Fields to store customer and staff lists
+    private List<Customer> customers = new ArrayList<>();
+    private List<Staff> staff;
+    
+    public void updateCustomerData(List<Customer> customers) {
+        this.customers = customers;
+    }
+    
+    private String getCustomerName(int customerId) {
+        for (Customer customer : customers) {
+            if (customer.getId() == customerId) {
+                return customer.getFirstName() + " " + customer.getLastName();
+            }
+        }
+        return "Unknown";
+    }
+    
+    public PreOrderListView(Composite parent, PreOrderController controller) {
+        this.controller = controller;
+        composite = new Composite(parent, SWT.NONE);
+        GridLayout layout = new GridLayout(1, false);
+        layout.marginWidth = MARGIN;
+        layout.marginHeight = MARGIN;
+        layout.verticalSpacing = SPACING;
+        layout.horizontalSpacing = SPACING;
+        composite.setLayout(layout);
+        composite.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+
+        createPreOrderListSection(parent);
+    }
+
+
+    private void createPreOrderListSection(Composite parent) {
+        // Add search panel at the top
+        Group searchGroup = new Group(composite, SWT.NONE);
+        searchGroup.setText("Search Pre-Orders");
+        GridLayout searchLayout = new GridLayout(7, false);
+        searchGroup.setLayout(searchLayout);
+        searchGroup.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+        searchGroup.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+        
+        // Pre-Order ID search
+        Label idLabel = new Label(searchGroup, SWT.NONE);
+        idLabel.setText("Pre-Order ID:");
+        idLabel.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+        
+        Text idText = new Text(searchGroup, SWT.BORDER);
+        idText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+        
+        // Customer name search
+        Label customerLabel = new Label(searchGroup, SWT.NONE);
+        customerLabel.setText("Customer:");
+        customerLabel.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+        
+        Text customerText = new Text(searchGroup, SWT.BORDER);
+        customerText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
+        
+        // Date range
+        Label dateRangeLabel = new Label(searchGroup, SWT.NONE);
+        dateRangeLabel.setText("Date Range:");
+        dateRangeLabel.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+        
+        DateTime fromDate = new DateTime(searchGroup, SWT.DATE | SWT.BORDER);
+        DateTime toDate = new DateTime(searchGroup, SWT.DATE | SWT.BORDER);
+        
+        // Search button row
+        Composite buttonRow = new Composite(searchGroup, SWT.NONE);
+        buttonRow.setLayout(new GridLayout(2, true));
+        buttonRow.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 7, 1));
+        buttonRow.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+        
+        Button searchButton = new Button(buttonRow, SWT.PUSH);
+        searchButton.setText("Search");
+        GridData searchBtnData = new GridData(SWT.RIGHT, SWT.CENTER, true, false);
+        searchBtnData.widthHint = 100;
+        searchButton.setLayoutData(searchBtnData);
+        searchButton.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_DARK_BLUE));
+        searchButton.setForeground(parent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+        
+        Button clearButton = new Button(buttonRow, SWT.PUSH);
+        clearButton.setText("Clear");
+        GridData clearBtnData = new GridData(SWT.LEFT, SWT.CENTER, true, false);
+        clearBtnData.widthHint = 100;
+        clearButton.setLayoutData(clearBtnData);
+        
+        // Add the search button listener
+        searchButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                // Get search criteria
+                String preOrderId = idText.getText().trim();
+                String customerName = customerText.getText().trim();
+                
+                // Format dates as YYYY-MM-DD
+                String fromDateStr = String.format("%04d-%02d-%02d", 
+                    fromDate.getYear(), fromDate.getMonth() + 1, fromDate.getDay());
+                String toDateStr = String.format("%04d-%02d-%02d", 
+                    toDate.getYear(), toDate.getMonth() + 1, toDate.getDay());
+                
+                // Call search method
+                controller.searchPreOrders(preOrderId, customerName, fromDateStr, toDateStr);
+            }
+        });
+        
+        // Add clear button listener
+        clearButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                idText.setText("");
+                customerText.setText("");
+                // Reset dates to current date
+                Calendar now = Calendar.getInstance();
+                fromDate.setDate(now.get(Calendar.YEAR), now.get(Calendar.MONTH), 1);
+                toDate.setDate(now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH));
+                
+                // Refresh original list
+                controller.refreshPreOrderList();
+            }
+        });       
+
+
+    	// Existing code for listGroup and preOrderTable...
+        Group listGroup = new Group(composite, SWT.NONE);
+        listGroup.setText("Pre-Order List");
+        GridLayout listLayout = new GridLayout(1, false);
+        listGroup.setLayout(listLayout);
+        GridData listData = new GridData(SWT.FILL, SWT.FILL, true, true);
+        listData.heightHint = 400;
+        listGroup.setLayoutData(listData);
+        listGroup.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+
+        // Add item details section
+        itemDetailsGroup = new Group(composite, SWT.NONE);
+        itemDetailsGroup.setText("Pre-Order Item Details");
+        GridLayout detailsLayout = new GridLayout(1, false);
+        itemDetailsGroup.setLayout(detailsLayout);
+        GridData detailsData = new GridData(SWT.FILL, SWT.FILL, true, true);
+        detailsData.heightHint = 150;
+        itemDetailsGroup.setLayoutData(detailsData);
+        itemDetailsGroup.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+        
+        // Create table for pre-orders
+        preOrderTable = new Table(listGroup, SWT.BORDER | SWT.FULL_SELECTION | SWT.MULTI);
+        preOrderTable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        preOrderTable.setHeaderVisible(true);
+        preOrderTable.setLinesVisible(true);
+
+        // Updated column titles to reflect names instead of IDs
+        String[] titles = {"ID", "Customer Name", "Staff Name", "Pre-Order Date", "Collection Date", "Collection Time", "Total Amount", "Status"};
+        for (String title : titles) {
+            TableColumn column = new TableColumn(preOrderTable, SWT.NONE);
+            column.setText(title);
+            column.setWidth(100);
+        }
+        
+        // Create table for order item details
+        itemDetailsTable = new Table(itemDetailsGroup, SWT.BORDER | SWT.FULL_SELECTION);
+        itemDetailsTable.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        itemDetailsTable.setHeaderVisible(true);
+        itemDetailsTable.setLinesVisible(true);
+        
+        String[] detailTitles = {"Item Name", "Price", "Quantity", "Subtotal"};
+        for (String title : detailTitles) {
+            TableColumn column = new TableColumn(itemDetailsTable, SWT.NONE);
+            column.setText(title);
+            column.setWidth(100);
+        }
+        
+        // Add selection listener to main preOrder table
+        preOrderTable.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                boolean hasSelection = preOrderTable.getSelectionCount() > 0;
+                markAsPaidButton.setEnabled(hasSelection);
+                editButton.setEnabled(hasSelection);
+                deleteButton.setEnabled(hasSelection);
+                
+                if (hasSelection) {
+                    TableItem selectedItem = preOrderTable.getSelection()[0];
+                    int preOrderId = Integer.parseInt(selectedItem.getText(0));
+                    controller.showPreOrderDetails(preOrderId);
+                } else {
+                    itemDetailsTable.removeAll();
+                }
+            }
+        });
+
+
+        // Create buttons composite with more buttons
+        Composite buttonComp = new Composite(listGroup, SWT.NONE);
+        buttonComp.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false));
+        buttonComp.setLayout(new GridLayout(4, false)); // Four columns for buttons
+        buttonComp.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+        
+        // Mark as Paid button       
+        markAsPaidButton = new Button(buttonComp, SWT.PUSH);
+        markAsPaidButton.setText("Mark as Paid");
+        GridData markAsPaidData = new GridData(SWT.FILL, SWT.CENTER, false, false);
+        markAsPaidData.widthHint = 100;
+        markAsPaidButton.setLayoutData(markAsPaidData);
+        markAsPaidButton.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_DARK_GREEN));
+        markAsPaidButton.setForeground(parent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+        markAsPaidButton.setEnabled(false);
+        markAsPaidButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                TableItem[] selectedItems = preOrderTable.getSelection();
+                if (selectedItems.length > 0) {
+                    // Show confirmation dialog
+                    MessageBox confirmDialog = new MessageBox(composite.getShell(),
+                        SWT.ICON_QUESTION | SWT.YES | SWT.NO);
+                    confirmDialog.setMessage("Are you sure you have received the payment?");
+                    confirmDialog.setText("Payment Confirmation");
+
+                    int response = confirmDialog.open();
+                    if (response == SWT.YES) {
+                        for (TableItem item : selectedItems) {
+                            int preOrderId = Integer.parseInt(item.getText(0));
+                            controller.updatePreOrderPaymentStatus(preOrderId, "Paid");
+                        }
+                        controller.refreshPreOrderList();
+                    }
+                }
+            }
+        });
+        
+        // New Edit button
+        editButton = new Button(buttonComp, SWT.PUSH);
+        editButton.setText("Edit Order");
+        GridData editData = new GridData(SWT.FILL, SWT.CENTER, false, false);
+        editData.widthHint = 100;
+        editButton.setLayoutData(editData);
+        editButton.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_DARK_BLUE));
+        editButton.setForeground(parent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+        editButton.setEnabled(false);
+        editButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                TableItem[] selectedItems = preOrderTable.getSelection();
+                if (selectedItems.length > 0) {
+                    int preOrderId = Integer.parseInt(selectedItems[0].getText(0));
+                    // Open edit dialog or navigate to edit page
+                    showEditPreOrderDialog(preOrderId);
+                }
+            }
+        });
+        
+        
+        // New Delete button
+        deleteButton = new Button(buttonComp, SWT.PUSH);
+        deleteButton.setText("Delete Order");
+        GridData deleteData = new GridData(SWT.FILL, SWT.CENTER, false, false);
+        deleteData.widthHint = 100;
+        deleteButton.setLayoutData(deleteData);
+        deleteButton.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_DARK_RED));
+        deleteButton.setForeground(parent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+        deleteButton.setEnabled(false);
+        deleteButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                TableItem[] selectedItems = preOrderTable.getSelection();
+                if (selectedItems.length > 0) {
+                    MessageBox confirmBox = new MessageBox(composite.getShell(), 
+                                                          SWT.ICON_WARNING | SWT.YES | SWT.NO);
+                    confirmBox.setText("Confirm Delete");
+                    confirmBox.setMessage("Are you sure you want to delete this pre-order?");
+                    
+                    if (confirmBox.open() == SWT.YES) {
+                        int preOrderId = Integer.parseInt(selectedItems[0].getText(0));
+                        controller.deletePreOrder(preOrderId);
+                    }
+                }
+            }
+        });
+
+        Button refreshButton = new Button(buttonComp, SWT.PUSH);
+        refreshButton.setText("Refresh");
+        GridData refreshData = new GridData(SWT.FILL, SWT.CENTER, false, false);
+        refreshData.widthHint = 100;
+        refreshButton.setLayoutData(refreshData);
+        refreshButton.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_DARK_CYAN));
+        refreshButton.setForeground(parent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+        refreshButton.addSelectionListener(new org.eclipse.swt.events.SelectionAdapter() {
+            @Override
+            public void widgetSelected(org.eclipse.swt.events.SelectionEvent e) {
+                controller.refreshPreOrderList();
+            }
+        });
+        
+        // New Assign Table button
+     Button assignTableButton = new Button(buttonComp, SWT.PUSH);
+     assignTableButton.setText("Assign Table");
+     GridData assignTableData = new GridData(SWT.FILL, SWT.CENTER, false, false);
+     assignTableData.widthHint = 100;
+     assignTableButton.setLayoutData(assignTableData);
+     assignTableButton.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_DARK_MAGENTA));
+     assignTableButton.setForeground(parent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+     assignTableButton.setEnabled(false);
+
+     Button releaseTableButton = new Button(buttonComp, SWT.PUSH);
+     releaseTableButton.setText("Release Table");
+     GridData releaseTableData = new GridData(SWT.FILL, SWT.CENTER, false, false);
+     releaseTableData.widthHint = 100;
+     releaseTableButton.setLayoutData(releaseTableData);
+     releaseTableButton.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_DARK_YELLOW));
+     releaseTableButton.setForeground(parent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
+     releaseTableButton.setEnabled(false);
+
+     // Update selection listener to enable these buttons
+     preOrderTable.addSelectionListener(new SelectionAdapter() {
+         @Override
+         public void widgetSelected(SelectionEvent e) {
+             boolean hasSelection = preOrderTable.getSelectionCount() > 0;
+             markAsPaidButton.setEnabled(hasSelection);
+             editButton.setEnabled(hasSelection);
+             deleteButton.setEnabled(hasSelection);
+             assignTableButton.setEnabled(hasSelection);
+             releaseTableButton.setEnabled(hasSelection);
+             
+             if (hasSelection) {
+                 TableItem selectedItem = preOrderTable.getSelection()[0];
+                 int preOrderId = Integer.parseInt(selectedItem.getText(0));
+                 controller.showPreOrderDetails(preOrderId);
+             } else {
+                 itemDetailsTable.removeAll();
+             }
+         }
+     });
+
+     // Add listeners for the new buttons
+     assignTableButton.addSelectionListener(new SelectionAdapter() {
+         @Override
+         public void widgetSelected(SelectionEvent e) {
+             TableItem[] selectedItems = preOrderTable.getSelection();
+             if (selectedItems.length > 0) {
+                 int preOrderId = Integer.parseInt(selectedItems[0].getText(0));
+                 controller.assignTableToPreOrder(preOrderId);
+             }
+         }
+     });
+
+     releaseTableButton.addSelectionListener(new SelectionAdapter() {
+         @Override
+         public void widgetSelected(SelectionEvent e) {
+             TableItem[] selectedItems = preOrderTable.getSelection();
+             if (selectedItems.length > 0) {
+                 int preOrderId = Integer.parseInt(selectedItems[0].getText(0));
+                 controller.releaseTableFromPreOrder(preOrderId);
+             }
+         }
+     });
+
+    }
+    
+    // Add dialog for editing a pre-order
+    private void showEditPreOrderDialog(int preOrderId) {
+        try {
+            PreOrder preOrder = controller.getDbManager().getPreOrderById(preOrderId);
+            List<DatabaseManager.OrderItemDetail> items = controller.getDbManager().getOrderItemsByPreOrderId(preOrderId);
+            
+            if (preOrder != null) {
+                Shell dialog = new Shell(composite.getShell(), SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
+                dialog.setText("Edit Pre-Order");
+                dialog.setLayout(new GridLayout(2, false));
+                
+                // TODO: Implement edit form with customer, staff selections and item edits
+                // This would be a complex UI component similar to PreOrderView
+                // For brevity, show a message that this feature is coming soon
+                
+                Label message = new Label(dialog, SWT.CENTER);
+                message.setText("Edit functionality will be implemented in the next version.");
+                message.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true, true, 2, 1));
+                
+                Button closeButton = new Button(dialog, SWT.PUSH);
+                closeButton.setText("Close");
+                closeButton.setLayoutData(new GridData(SWT.CENTER, SWT.CENTER, true, false, 2, 1));
+                closeButton.addSelectionListener(new SelectionAdapter() {
+                    @Override
+                    public void widgetSelected(SelectionEvent e) {
+                        dialog.close();
+                    }
+                });
+                
+                dialog.pack();
+                dialog.open();
+            }
+        } catch (SQLException e) {
+            showMessage("Error retrieving pre-order details: " + e.getMessage(), SWT.ICON_ERROR);
+        }
+    }
+
+
+    public void displayPreOrders(List<PreOrder> preOrders) {
+        preOrderTable.removeAll();
+
+        try {
+            // Get fresh staff list for name lookups if needed
+            if (staff == null) staff = controller.getDbManager().getAllStaff();
+
+            for (PreOrder preOrder : preOrders) {
+                TableItem item = new TableItem(preOrderTable, SWT.NONE);
+                item.setText(0, String.valueOf(preOrder.getId()));
+
+                // Use the helper method instead of inline lookup
+                item.setText(1, getCustomerName(preOrder.getCustomerId()));
+
+                // Find and display staff name instead of ID
+                String staffName = "Unknown";
+                for (Staff s : staff) {
+                    if (s.getId() == preOrder.getStaffId()) {
+                        staffName = s.getFirstName() + " " + s.getLastName();
+                        break;
+                    }
+                }
+                item.setText(2, staffName);
+
+                item.setText(3, preOrder.getPreorderDate());
+                item.setText(4, preOrder.getCollectionDate());
+                item.setText(5, preOrder.getCollectionTime());
+                item.setText(6, String.format("%.2f", preOrder.getTotalAmount()));
+                item.setText(7, preOrder.getPaymentStatus());
+            }
+
+            // Adjust column widths
+            for (TableColumn column : preOrderTable.getColumns()) {
+                column.pack();
+            }
+        } catch (SQLException e) {
+            showMessage("Error retrieving staff data: " + e.getMessage(), SWT.ICON_ERROR);
+        }
+    }
+    
+ // Change this in PreOrderListView
+    public void displayPreOrderDetails(java.util.List<DatabaseManager.OrderItemDetail> items) {
+        itemDetailsTable.removeAll();
+        
+        for (DatabaseManager.OrderItemDetail item : items) {
+            TableItem tableItem = new TableItem(itemDetailsTable, SWT.NONE);
+            tableItem.setText(0, item.getItemName());
+            tableItem.setText(1, String.format("$%.2f", item.getPrice()));
+            tableItem.setText(2, String.valueOf(item.getQuantity()));
+            tableItem.setText(3, String.format("$%.2f", item.getTotalPrice()));
+        }
+        
+        // Adjust column widths
+        for (TableColumn column : itemDetailsTable.getColumns()) {
+            column.pack();
+        }
+    }
+
+
+    public Composite getComposite() {
+        return composite;
+    }
+
+    public void showMessage(String message, int style) {
+        MessageBox messageBox = new MessageBox(composite.getShell(), style);
+        messageBox.setMessage(message);
+        messageBox.open();
+    }
+}
