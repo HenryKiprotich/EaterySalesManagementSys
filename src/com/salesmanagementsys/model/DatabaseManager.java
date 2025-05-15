@@ -23,42 +23,42 @@ public class DatabaseManager {
     public DatabaseManager() throws SQLException {
         // Load configuration before connecting
         loadConfiguration();
-        
+
         // Now connect with the loaded configuration
         this.connection = DriverManager.getConnection(dbURL, dbUser, dbPassword);
         initializeDatabase();
     }
-    
+
     private void loadConfiguration() {
         // Default values (as fallback)
         this.dbURL = "jdbc:mysql://localhost:3306/amazingdessertbar";
         this.dbUser = "root";
-        this.dbPassword = "Sequel@0101";
-        
+        this.dbPassword = "";
+
         try {
             // Try to load from current directory
             File configFile = new File("config.properties");
-            
+
             // If not found, try to load from installation directory
             if (!configFile.exists()) {
                 String appPath = System.getProperty("user.dir");
                 configFile = new File(appPath, "config.properties");
-                
+
                 // If still not found, try app directory/resources
                 if (!configFile.exists()) {
                     configFile = new File(new File(appPath, "app"), "config.properties");
                 }
             }
-            
+
             if (configFile.exists()) {
                 try (FileInputStream fis = new FileInputStream(configFile)) {
                     Properties props = new Properties();
                     props.load(fis);
-                    
+
                     this.dbURL = props.getProperty("db.url", this.dbURL);
                     this.dbUser = props.getProperty("db.user", this.dbUser);
                     this.dbPassword = props.getProperty("db.password", this.dbPassword);
-                    
+
                     System.out.println("Database configuration loaded from: " + configFile.getAbsolutePath());
                 }
             } else {
@@ -76,16 +76,16 @@ public class DatabaseManager {
             System.err.println("Error loading/creating configuration: " + e.getMessage());
         }
     }
-   
+
 
     private void initializeDatabase() throws SQLException {
         // Create tables if they don't exist
         createTables();
-        
+
         // Add default items if items table is empty
         addDefaultItems();
-    } 
-    
+    }
+
 
 
     private void createTables() throws SQLException {
@@ -97,7 +97,7 @@ public class DatabaseManager {
                 "city VARCHAR(100), " +
                 "mobile_number VARCHAR(20), " +
         		"debt DECIMAL(10, 2) DEFAULT 0.00)";  // Add this line
-                
+
         // Create staff table
         String staffSql = "CREATE TABLE IF NOT EXISTS staff (" +
                 "id INT AUTO_INCREMENT PRIMARY KEY, " +
@@ -107,19 +107,19 @@ public class DatabaseManager {
                 "job_role VARCHAR(50), " +
                 "username VARCHAR(50), " +
                 "password VARCHAR(50))";
-        
+
      // In the createTables() method, add:
         String jobRoleSql = "CREATE TABLE IF NOT EXISTS job_roles (" +
                 "id INT AUTO_INCREMENT PRIMARY KEY, " +
                 "name VARCHAR(50) UNIQUE, " +
-                "description VARCHAR(255))";        
-                
+                "description VARCHAR(255))";
+
         // Create items table
         String itemSql = "CREATE TABLE IF NOT EXISTS items (" +
                 "id INT AUTO_INCREMENT PRIMARY KEY, " +
                 "name VARCHAR(100), " +
                 "price DECIMAL(10, 2))";
-                
+
         // Create orders table
         String orderSql = "CREATE TABLE IF NOT EXISTS orders (" +
                 "id INT AUTO_INCREMENT PRIMARY KEY, " +
@@ -127,11 +127,11 @@ public class DatabaseManager {
                 "staff_id INT, " +
                 "order_date VARCHAR(20), " +
                 "payment_method VARCHAR(50), " +
-                "payment_status VARCHAR(20) DEFAULT 'Pending', " + 
+                "payment_status VARCHAR(20) DEFAULT 'Pending', " +
                 "total_amount DECIMAL(10, 2), " +
                 "FOREIGN KEY (customer_id) REFERENCES customers(id), " +
                 "FOREIGN KEY (staff_id) REFERENCES staff(id))";
-                
+
         // Create preorders table
         String preorderSql = "CREATE TABLE IF NOT EXISTS preorders (" +
                 "id INT AUTO_INCREMENT PRIMARY KEY, " +
@@ -140,11 +140,11 @@ public class DatabaseManager {
                 "preorder_date VARCHAR(20), " +
                 "collection_date VARCHAR(20), " +
                 "collection_time VARCHAR(20), " +
-                "payment_status VARCHAR(20) DEFAULT 'Pending', " +  
+                "payment_status VARCHAR(20) DEFAULT 'Pending', " +
                 "total_amount DECIMAL(10, 2), " +
                 "FOREIGN KEY (customer_id) REFERENCES customers(id), " +
                 "FOREIGN KEY (staff_id) REFERENCES staff(id))";
-                
+
         // Create order_items table
         String orderItemSql = "CREATE TABLE IF NOT EXISTS order_items (" +
                 "id INT AUTO_INCREMENT PRIMARY KEY, " +
@@ -174,9 +174,9 @@ public class DatabaseManager {
             stmt.execute(stockPurchaseSql);
             stmt.execute(jobRoleSql);
         }
-    }    
- 
- 
+    }
+
+
     public List<OrderItemDetail> getOrderItemsByOrderId(int orderId) throws SQLException {
         // Call the existing method with preOrderId set to 0 to only get items for this order
         return getOrderItemsWithDetails(orderId, 0);
@@ -202,7 +202,7 @@ public class DatabaseManager {
                 stmt.execute(insertSql);
             }
         }
-        
+
         // Add default staff if table is empty
         countSql = "SELECT COUNT(*) FROM staff";
         try (Statement stmt = connection.createStatement();
@@ -231,7 +231,7 @@ public class DatabaseManager {
     public List<Customer> getAllCustomers() throws SQLException {
         List<Customer> customers = new ArrayList<>();
         String sql = "SELECT * FROM customers";
-        
+
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
@@ -260,7 +260,7 @@ public class DatabaseManager {
             pstmt.executeUpdate();
         }
     }
-    
+
     // Add this to the initializeDatabase() method
     private void addDefaultRoles() throws SQLException {
         // Check if job_roles table is empty
@@ -283,7 +283,7 @@ public class DatabaseManager {
     public List<Staff> getAllStaff() throws SQLException {
         List<Staff> staffList = new ArrayList<>();
         String sql = "SELECT * FROM staff";
-        
+
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
@@ -299,13 +299,13 @@ public class DatabaseManager {
             }
         }
         return staffList;
-    } 
-    
+    }
+
  // Add methods to retrieve job roles
     public List<JobRole> getAllJobRoles() throws SQLException {
         List<JobRole> roles = new ArrayList<>();
         String sql = "SELECT * FROM job_roles ORDER BY name";
-        
+
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
@@ -323,7 +323,7 @@ public class DatabaseManager {
     public List<Item> getAllItems() throws SQLException {
         List<Item> items = new ArrayList<>();
         String sql = "SELECT * FROM items";
-        
+
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
@@ -340,10 +340,10 @@ public class DatabaseManager {
     public int addOrder(Order order, List<OrderItem> orderItems) throws SQLException {
         connection.setAutoCommit(false);
         int orderId = 0;
-        
+
         try {
             String sql = "INSERT INTO orders (customer_id, staff_id, order_date, payment_method, total_amount) VALUES (?, ?, ?, ?, ?)";
-            
+
             try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
                 pstmt.setInt(1, order.getCustomerId());
                 pstmt.setInt(2, order.getStaffId());
@@ -351,14 +351,14 @@ public class DatabaseManager {
                 pstmt.setString(4, order.getPaymentMethod());
                 pstmt.setDouble(5, order.getTotalAmount());
                 pstmt.executeUpdate();
-                
+
                 try (ResultSet rs = pstmt.getGeneratedKeys()) {
                     if (rs.next()) {
                         orderId = rs.getInt(1);
                     }
                 }
             }
-            
+
             String itemSql = "INSERT INTO order_items (order_id, preorder_id, item_id, quantity) VALUES (?, ?, ?, ?)";
             try (PreparedStatement pstmt = connection.prepareStatement(itemSql)) {
                 for (OrderItem item : orderItems) {
@@ -369,7 +369,7 @@ public class DatabaseManager {
                     pstmt.executeUpdate();
                 }
             }
-            
+
             connection.commit();
         } catch (SQLException e) {
             connection.rollback();
@@ -377,16 +377,16 @@ public class DatabaseManager {
         } finally {
             connection.setAutoCommit(true);
         }
-        
+
         return orderId;
     }
-    
+
  // Add these methods to DatabaseManager.java
 
     public List<Order> getAllOrders() throws SQLException {
         List<Order> orders = new ArrayList<>();
         String sql = "SELECT * FROM orders";
-        
+
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
@@ -403,7 +403,7 @@ public class DatabaseManager {
         }
         return orders;
     }
-    
+
     public void updateOrder(Order order, List<OrderItem> orderItems) throws SQLException {
         connection.setAutoCommit(false);
         try {
@@ -420,14 +420,14 @@ public class DatabaseManager {
                 pstmt.setInt(7, order.getId());
                 pstmt.executeUpdate();
             }
-            
+
             // Delete existing order items
             String deleteItemsSQL = "DELETE FROM order_items WHERE order_id = ?";
             try (PreparedStatement pstmt = connection.prepareStatement(deleteItemsSQL)) {
                 pstmt.setInt(1, order.getId());
                 pstmt.executeUpdate();
             }
-            
+
             // Insert new order items
             String insertItemSQL = "INSERT INTO order_items (order_id, preorder_id, item_id, quantity) VALUES (?, ?, ?, ?)";
             try (PreparedStatement pstmt = connection.prepareStatement(insertItemSQL)) {
@@ -439,7 +439,7 @@ public class DatabaseManager {
                     pstmt.executeUpdate();
                 }
             }
-            
+
             connection.commit();
         } catch (SQLException e) {
             connection.rollback();
@@ -448,7 +448,7 @@ public class DatabaseManager {
             connection.setAutoCommit(true);
         }
     }
-    
+
     public void deleteOrder(int orderId) throws SQLException {
         connection.setAutoCommit(false);
         try {
@@ -458,14 +458,14 @@ public class DatabaseManager {
                 pstmt.setInt(1, orderId);
                 pstmt.executeUpdate();
             }
-            
+
             // Then delete the order itself
             String deleteOrderSQL = "DELETE FROM orders WHERE id = ?";
             try (PreparedStatement pstmt = connection.prepareStatement(deleteOrderSQL)) {
                 pstmt.setInt(1, orderId);
                 pstmt.executeUpdate();
             }
-            
+
             connection.commit();
         } catch (SQLException e) {
             connection.rollback();
@@ -478,11 +478,11 @@ public class DatabaseManager {
     public int addPreOrder(PreOrder preOrder, List<OrderItem> orderItems) throws SQLException {
         connection.setAutoCommit(false);
         int preorderId = 0;
-        
+
         try {
             String sql = "INSERT INTO preorders (customer_id, staff_id, preorder_date, collection_date, collection_time, total_amount) " +
                          "VALUES (?, ?, ?, ?, ?, ?)";
-            
+
             try (PreparedStatement pstmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
                 pstmt.setInt(1, preOrder.getCustomerId());
                 pstmt.setInt(2, preOrder.getStaffId());
@@ -491,14 +491,14 @@ public class DatabaseManager {
                 pstmt.setString(5, preOrder.getCollectionTime());
                 pstmt.setDouble(6, preOrder.getTotalAmount());
                 pstmt.executeUpdate();
-                
+
                 try (ResultSet rs = pstmt.getGeneratedKeys()) {
                     if (rs.next()) {
                         preorderId = rs.getInt(1);
                     }
                 }
             }
-            
+
             String itemSql = "INSERT INTO order_items (order_id, preorder_id, item_id, quantity) VALUES (?, ?, ?, ?)";
             try (PreparedStatement pstmt = connection.prepareStatement(itemSql)) {
                 for (OrderItem item : orderItems) {
@@ -509,7 +509,7 @@ public class DatabaseManager {
                     pstmt.executeUpdate();
                 }
             }
-            
+
             connection.commit();
         } catch (SQLException e) {
             connection.rollback();
@@ -517,14 +517,14 @@ public class DatabaseManager {
         } finally {
             connection.setAutoCommit(true);
         }
-        
+
         return preorderId;
     }
-    
+
     public List<PreOrder> getAllPreOrders() throws SQLException {
         List<PreOrder> preOrders = new ArrayList<>();
         String sql = "SELECT * FROM preorders";
-        
+
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
@@ -542,7 +542,7 @@ public class DatabaseManager {
         }
         return preOrders;
     }
-    
+
     public void updatePreOrder(PreOrder preOrder, List<OrderItem> orderItems) throws SQLException {
         connection.setAutoCommit(false);
         try {
@@ -561,14 +561,14 @@ public class DatabaseManager {
                 pstmt.setInt(8, preOrder.getId());
                 pstmt.executeUpdate();
             }
-            
+
             // Delete existing order items
             String deleteItemsSQL = "DELETE FROM order_items WHERE preorder_id = ?";
             try (PreparedStatement pstmt = connection.prepareStatement(deleteItemsSQL)) {
                 pstmt.setInt(1, preOrder.getId());
                 pstmt.executeUpdate();
             }
-            
+
             // Insert new order items
             String insertItemSQL = "INSERT INTO order_items (order_id, preorder_id, item_id, quantity) VALUES (?, ?, ?, ?)";
             try (PreparedStatement pstmt = connection.prepareStatement(insertItemSQL)) {
@@ -580,7 +580,7 @@ public class DatabaseManager {
                     pstmt.executeUpdate();
                 }
             }
-            
+
             connection.commit();
         } catch (SQLException e) {
             connection.rollback();
@@ -588,9 +588,9 @@ public class DatabaseManager {
         } finally {
             connection.setAutoCommit(true);
         }
-    }            
-     
-    
+    }
+
+
     public void deletePreOrder(int preOrderId) throws SQLException {
         connection.setAutoCommit(false);
         try {
@@ -600,14 +600,14 @@ public class DatabaseManager {
                 pstmt.setInt(1, preOrderId);
                 pstmt.executeUpdate();
             }
-            
+
             // Then delete the preorder itself
             String deletePreOrderSQL = "DELETE FROM preorders WHERE id = ?";
             try (PreparedStatement pstmt = connection.prepareStatement(deletePreOrderSQL)) {
                 pstmt.setInt(1, preOrderId);
                 pstmt.executeUpdate();
             }
-            
+
             connection.commit();
         } catch (SQLException e) {
             connection.rollback();
@@ -616,9 +616,9 @@ public class DatabaseManager {
             connection.setAutoCommit(true);
         }
     }
-    
-    
-    
+
+
+
     public void addItem(Item item) throws SQLException {
         String sql = "INSERT INTO items (name, price) VALUES (?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
@@ -627,7 +627,7 @@ public class DatabaseManager {
             pstmt.executeUpdate();
         }
     }
-    
+
  // Add these new methods to DatabaseManager:
     public void addStockPurchase(StockPurchase purchase) throws SQLException {
         String sql = "INSERT INTO stock_purchases (item_name, price, quantity, purchase_date, notes) VALUES (?, ?, ?, ?, ?)";
@@ -640,11 +640,11 @@ public class DatabaseManager {
             pstmt.executeUpdate();
         }
     }
-    
+
     public List<StockPurchase> getAllStockPurchases() throws SQLException {
         List<StockPurchase> purchases = new ArrayList<>();
         String sql = "SELECT * FROM stock_purchases ORDER BY purchase_date DESC";
-        
+
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
@@ -660,7 +660,7 @@ public class DatabaseManager {
         }
         return purchases;
     }
-    
+
     public void updateOrderPaymentStatus(int orderId, String status) throws SQLException {
         String sql = "UPDATE orders SET payment_status = ? WHERE id = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
@@ -678,7 +678,7 @@ public class DatabaseManager {
             pstmt.executeUpdate();
         }
     }
-    
+
     public void updateCustomerDebt(int customerId, double amount) throws SQLException {
 		String sql = "UPDATE customers SET debt = debt + ? WHERE id = ?";
 		try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
@@ -687,7 +687,7 @@ public class DatabaseManager {
 			pstmt.executeUpdate();
 		}
 	}
-    
+
  // Add to DatabaseManager.java
     public Order getOrderById(int orderId) throws SQLException {
         String sql = "SELECT * FROM orders WHERE id = ?";
@@ -738,14 +738,14 @@ public class DatabaseManager {
             connection.close();
         }
     }
-    
-    /*    
+
+    /*
     public Staff authenticateStaff(String username, String password) throws SQLException {
         String sql = "SELECT * FROM staff WHERE username = ? AND password = ?";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
             pstmt.setString(1, username);
             pstmt.setString(2, password);
-            
+
             try (ResultSet rs = pstmt.executeQuery()) {
                 if (rs.next()) {
                     return new Staff(
@@ -762,7 +762,7 @@ public class DatabaseManager {
         }
         return null;
     }*/
-    
+
     public Staff getStaffByUsername(String username) throws SQLException {
         String query = "SELECT * FROM staff WHERE username = ?";
         try (PreparedStatement stmt = connection.prepareStatement(query)) {
@@ -776,7 +776,7 @@ public class DatabaseManager {
                     staff.setHireDate(rs.getString("hire_date"));
                     staff.setJobRole(rs.getString("job_role"));
                     staff.setUsername(rs.getString("username"));
-                    String password = rs.getString("password");                   
+                    String password = rs.getString("password");
                     staff.setPassword(password);
                     return staff;
                 }
@@ -785,15 +785,15 @@ public class DatabaseManager {
         return null;
     }
 
-    
+
     public List<StockPurchase> getStockPurchasesByDateRange(String startDate, String endDate) throws SQLException {
         List<StockPurchase> purchases = new ArrayList<>();
         String sql = "SELECT * FROM stock_purchases WHERE purchase_date BETWEEN ? AND ? ORDER BY purchase_date";
-        
+
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, startDate);
             stmt.setString(2, endDate);
-            
+
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     purchases.add(new StockPurchase(
@@ -813,11 +813,11 @@ public class DatabaseManager {
     public List<Order> getOrdersByDateRange(String startDate, String endDate) throws SQLException {
         List<Order> orders = new ArrayList<>();
         String sql = "SELECT * FROM orders WHERE order_date BETWEEN ? AND ? ORDER BY order_date";
-        
+
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, startDate);
             stmt.setString(2, endDate);
-            
+
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     orders.add(new Order(
@@ -838,11 +838,11 @@ public class DatabaseManager {
     public List<PreOrder> getPreOrdersByDateRange(String startDate, String endDate) throws SQLException {
         List<PreOrder> preOrders = new ArrayList<>();
         String sql = "SELECT * FROM preorders WHERE preorder_date BETWEEN ? AND ? ORDER BY preorder_date";
-        
+
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, startDate);
             stmt.setString(2, endDate);
-            
+
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     preOrders.add(new PreOrder(
@@ -863,16 +863,16 @@ public class DatabaseManager {
 
     public List<OrderItemDetail> getOrderItemsWithDetails(int orderId, int preOrderId) throws SQLException {
         List<OrderItemDetail> itemDetails = new ArrayList<>();
-        
+
         // SQL joins order_items with items to get name and price
         String sql = "SELECT oi.*, i.name as item_name, i.price FROM order_items oi " +
                      "JOIN items i ON oi.item_id = i.id " +
                      "WHERE oi.order_id = ? OR oi.preorder_id = ?";
-        
+
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setInt(1, orderId);
             stmt.setInt(2, preOrderId);
-            
+
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     itemDetails.add(new OrderItemDetail(
@@ -885,8 +885,8 @@ public class DatabaseManager {
             }
         }
         return itemDetails;
-    }    
- 
+    }
+
     public boolean customerNameExists(String firstName, String lastName) throws SQLException {
         String sql = "SELECT COUNT(*) FROM customers WHERE first_name = ? AND last_name = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -905,7 +905,7 @@ public class DatabaseManager {
         if (mobileNumber == null || mobileNumber.isEmpty()) {
             return false;
         }
-        
+
         String sql = "SELECT COUNT(*) FROM customers WHERE mobile_number = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
             stmt.setString(1, mobileNumber);
@@ -938,23 +938,23 @@ public class DatabaseManager {
         private String itemName;
         private int quantity;
         private double price;
-        
+
         public OrderItemDetail(int itemId, String itemName, int quantity, double price) {
             this.itemId = itemId;
             this.itemName = itemName;
             this.quantity = quantity;
             this.price = price;
         }
-        
+
         public int getItemId() { return itemId; }
         public String getItemName() { return itemName; }
         public int getQuantity() { return quantity; }
         public double getPrice() { return price; }
         public double getTotalPrice() { return quantity * price; }
     }
-    
-    
-    
+
+
+
     public Staff getStaffById(int staffId) throws SQLException {
         String sql = "SELECT * FROM staff WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -975,7 +975,7 @@ public class DatabaseManager {
         }
         return null;
     }
-    
+
     public void updateStaff(Staff staff) throws SQLException {
         String sql = "UPDATE staff SET first_name = ?, last_name = ?, hire_date = ?, " +
                     "job_role = ?, username = ?, password = ? WHERE id = ?";
@@ -990,13 +990,13 @@ public class DatabaseManager {
             pstmt.executeUpdate();
         }
     }
-    
+
     public List<Order> searchOrders(String customerName, String fromDate, String toDate) throws SQLException {
         List<Order> orders = new ArrayList<>();
         StringBuilder sql = new StringBuilder("SELECT o.* FROM orders o");
         List<Object> params = new ArrayList<>();
         boolean hasWhere = false;
-        
+
         // Join with customers if we're searching by customer name
         if (customerName != null && !customerName.isEmpty()) {
             sql.append(" JOIN customers c ON o.customer_id = c.id");
@@ -1005,7 +1005,7 @@ public class DatabaseManager {
             params.add("%" + customerName + "%");
             hasWhere = true;
         }
-        
+
         // Add date range criteria
         if (fromDate != null && !fromDate.isEmpty() && toDate != null && !toDate.isEmpty()) {
             if (hasWhere) {
@@ -1018,16 +1018,16 @@ public class DatabaseManager {
             params.add(fromDate);
             params.add(toDate);
         }
-        
+
         // Order by date
         sql.append(" ORDER BY o.order_date DESC");
-        
+
         try (PreparedStatement stmt = connection.prepareStatement(sql.toString())) {
             // Set parameters
             for (int i = 0; i < params.size(); i++) {
                 stmt.setObject(i + 1, params.get(i));
             }
-            
+
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     orders.add(new Order(
@@ -1044,13 +1044,13 @@ public class DatabaseManager {
         }
         return orders;
     }
-    
+
     public List<PreOrder> searchPreOrders(String customerName, String fromDate, String toDate) throws SQLException {
         List<PreOrder> preOrders = new ArrayList<>();
         StringBuilder sql = new StringBuilder("SELECT p.* FROM preorders p");
         List<Object> params = new ArrayList<>();
         boolean hasWhere = false;
-        
+
         // Join with customers if we're searching by customer name
         if (customerName != null && !customerName.isEmpty()) {
             sql.append(" JOIN customers c ON p.customer_id = c.id");
@@ -1059,7 +1059,7 @@ public class DatabaseManager {
             params.add("%" + customerName + "%");
             hasWhere = true;
         }
-        
+
         // Add date range criteria
         if (fromDate != null && !fromDate.isEmpty() && toDate != null && !toDate.isEmpty()) {
             if (hasWhere) {
@@ -1074,16 +1074,16 @@ public class DatabaseManager {
             params.add(fromDate);
             params.add(toDate);
         }
-        
+
         // Order by date
         sql.append(" ORDER BY p.preorder_date DESC");
-        
+
         try (PreparedStatement stmt = connection.prepareStatement(sql.toString())) {
             // Set parameters
             for (int i = 0; i < params.size(); i++) {
                 stmt.setObject(i + 1, params.get(i));
             }
-            
+
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     preOrders.add(new PreOrder(
@@ -1101,7 +1101,7 @@ public class DatabaseManager {
         }
         return preOrders;
     }
-    
+
  // Add to DatabaseManager.java
     public void createTablesTable() throws SQLException {
         String sql = "CREATE TABLE IF NOT EXISTS tables (" +
@@ -1111,7 +1111,7 @@ public class DatabaseManager {
                     "status TEXT DEFAULT 'Available' CHECK(status IN ('Available', 'Occupied', 'Reserved')), " +
                     "current_order_id INTEGER DEFAULT NULL, " +
                     "current_preorder_id INTEGER DEFAULT NULL)";
-        
+
         try (Statement stmt = connection.createStatement()) {
             stmt.execute(sql);
         }
@@ -1124,7 +1124,7 @@ public class DatabaseManager {
             pstmt.setInt(2, table.getCapacity());
             pstmt.setString(3, table.getStatus());
             pstmt.executeUpdate();
-            
+
             try (ResultSet rs = pstmt.getGeneratedKeys()) {
                 if (rs.next()) {
                     return rs.getInt(1);
@@ -1137,7 +1137,7 @@ public class DatabaseManager {
     public List<Table> getAllTables() throws SQLException {
         List<Table> tables = new ArrayList<>();
         String sql = "SELECT * FROM tables ORDER BY number";
-        
+
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
@@ -1158,7 +1158,7 @@ public class DatabaseManager {
     public List<Table> getAvailableTables() throws SQLException {
         List<Table> tables = new ArrayList<>();
         String sql = "SELECT * FROM tables WHERE status = 'Available' ORDER BY number";
-        
+
         try (Statement stmt = connection.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
@@ -1263,7 +1263,7 @@ public class DatabaseManager {
         }
         return null;
     }
-    
+
     public List<Object[]> getTablesWithOrderDetails() throws SQLException {
         List<Object[]> result = new ArrayList<>();
         String sql = "SELECT t.id, t.number, t.capacity, t.status, " +
@@ -1277,10 +1277,10 @@ public class DatabaseManager {
                      "LEFT JOIN customers c1 ON o.customer_id = c1.id " +
                      "LEFT JOIN customers c2 ON p.customer_id = c2.id " +
                      "ORDER BY t.number";
-        
+
         try (PreparedStatement stmt = connection.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
-            
+
             while (rs.next()) {
                 Table table = new Table(
                     rs.getInt("id"),
@@ -1288,7 +1288,7 @@ public class DatabaseManager {
                     rs.getInt("capacity"),
                     rs.getString("status")
                 );
-                
+
                 int orderId = rs.getInt("order_id");
                 String orderDetails = null;
                 if (!rs.wasNull()) {
@@ -1296,7 +1296,7 @@ public class DatabaseManager {
                     double amount = rs.getDouble("order_amount");
                     orderDetails = "Order #" + orderId + " - " + customerName + " ($" + String.format("%.2f", amount) + ")";
                 }
-                
+
                 int preorderId = rs.getInt("preorder_id");
                 String preorderDetails = null;
                 if (!rs.wasNull()) {
@@ -1304,20 +1304,20 @@ public class DatabaseManager {
                     double amount = rs.getDouble("preorder_amount");
                     preorderDetails = "Pre-Order #" + preorderId + " - " + customerName + " ($" + String.format("%.2f", amount) + ")";
                 }
-                
+
                 if (orderId == 0) table.setCurrentOrderId(null);
                 else table.setCurrentOrderId(orderId);
-                
+
                 if (preorderId == 0) table.setCurrentPreOrderId(null);
                 else table.setCurrentPreOrderId(preorderId);
-                
+
                 result.add(new Object[] { table, orderDetails, preorderDetails });
             }
         }
-        
+
         return result;
     }
-    
+
  }
 
 

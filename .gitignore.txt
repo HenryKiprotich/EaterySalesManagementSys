@@ -1,0 +1,10 @@
+# Eclipse 
+.classpath 
+.project 
+.settings/ 
+bin/ 
+*.class 
+# SQLite database file 
+dessert_bar.db 
+/target/
+*.exe
