@@ -55,7 +55,7 @@ public class CustomerListView {
 
         Composite buttonComp = new Composite(listGroup, SWT.NONE);
         buttonComp.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false));
-        // Changed to 1 column as we only have the refresh button now
+        // 1 column as we only have the refresh button now
         buttonComp.setLayout(new GridLayout(1, false));
         buttonComp.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 
@@ -77,8 +77,7 @@ public class CustomerListView {
 
     public void displayCustomers(List<Customer> customers) {
         customerTable.removeAll();
-
-     // In the displayCustomers method, update the table item creation:
+     
         for (Customer customer : customers) {
             TableItem item = new TableItem(customerTable, SWT.NONE);
             item.setText(0, String.valueOf(customer.getId()));

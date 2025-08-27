@@ -6,15 +6,14 @@ public class Customer {
     private String lastName;
     private String city;
     private String mobileNumber;
-    private double debt; // New field
+    private double debt; 
 
     public Customer(int id, String firstName, String lastName, String city, String mobileNumber, double debt) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.city = city;
-        this.mobileNumber = mobileNumber;
-     // Existing assignments
+        this.mobileNumber = mobileNumber;     
         this.debt = debt;
     }
 
@@ -22,7 +21,6 @@ public class Customer {
     public String getFirstName() { return firstName; }
     public String getLastName() { return lastName; }
     public String getCity() { return city; }
-    public String getMobileNumber() { return mobileNumber; }
-    // New getter for debt
+    public String getMobileNumber() { return mobileNumber; }    
     public double getDebt() { return debt; }
 }

@@ -33,7 +33,7 @@ public class Staff {
     public String getUsername() { return username; }
     public String getPassword() { return password; }
     
-    // Add setters
+    // setters
     public void setId(int id) { this.id = id; }
     public void setFirstName(String firstName) { this.firstName = firstName; }
     public void setLastName(String lastName) { this.lastName = lastName; }

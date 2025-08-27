@@ -15,7 +15,7 @@ public class MainView {
     private Shell shell;
     private Composite contentArea;
     private StackLayout stackLayout;
-    private Staff loggedInStaff; // Add logged-in staff member
+    private Staff loggedInStaff; 
     
     // View references
     private CustomerView customerView;
@@ -29,8 +29,7 @@ public class MainView {
     private ItemView itemView;
     private ItemListView itemListView;
     private StockPurchaseView stockPurchaseView;
-    private StockPurchaseListView stockPurchaseListView;
- // Add to existing fields in MainView.java
+    private StockPurchaseListView stockPurchaseListView; 
     private ReportView reportView;
     private TableManagementView tableManagementView;
 

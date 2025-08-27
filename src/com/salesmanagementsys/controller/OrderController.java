@@ -149,7 +149,7 @@ public class OrderController {
     }
 
     
- // Update createOrder to accept itemsList
+ // createOrder that accepts itemsList
     public void createOrder(int customerId, int staffId, String orderDate, String paymentMethod, 
                            double totalAmount, java.util.List<OrderItem> orderItems) {
         try {
@@ -191,7 +191,7 @@ public class OrderController {
         }
     }
     
- // Add to OrderController
+ // Delete Order, Call the dbManager.deleteOrder
     public void deleteOrder(int orderId) {
         try {
             // Get the order to access customer info for debt adjustment
@@ -232,8 +232,7 @@ public class OrderController {
             }
         }
     }
-
- // In OrderController.java
+ 
     public void refreshOrderList() {
         if (listView != null) {
             try {
@@ -291,9 +290,8 @@ public class OrderController {
         } catch (SQLException e) {
             listView.showMessage("Error searching orders: " + e.getMessage(), SWT.ICON_ERROR);
         }
-    } 
-    
- // Add to OrderController.java
+    }     
+
     public void assignTableToOrder(int orderId) {
         try {
             // Check if the order is already assigned to a table
@@ -341,10 +339,9 @@ public class OrderController {
         } catch (SQLException e) {
             listView.showMessage("Error releasing table: " + e.getMessage(), SWT.ICON_ERROR);
         }
-    }
-   
+    }  
     
- // Add to OrderController.java
+
     public DatabaseManager getDbManager() {
         return dbManager;
     } 

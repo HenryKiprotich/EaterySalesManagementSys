@@ -68,7 +68,7 @@ public class StaffListView {
         buttonComp.setLayout(new GridLayout(2, false));
         buttonComp.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
         
-        // Add Edit button
+        // Edit button
         editButton = new Button(buttonComp, SWT.PUSH);
         editButton.setText("Edit Staff");
         GridData editData = new GridData(SWT.FILL, SWT.CENTER, false, false);
@@ -101,7 +101,7 @@ public class StaffListView {
             }
         });
         
-        // Add selection listener to enable/disable edit button
+        // selection listener to enable/disable edit button
         staffTable.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -130,7 +130,7 @@ public class StaffListView {
         }
     }
     
- // Add method to display the edit dialog
+ // method to display the edit dialog
     private void showEditStaffDialog(int staffId) {
         try {
             Staff staff = controller.getStaffById(staffId);

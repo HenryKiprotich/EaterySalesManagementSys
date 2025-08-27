@@ -181,7 +181,7 @@ public class ReportView {
             dayCombo = new Combo(this, SWT.DROP_DOWN | SWT.READ_ONLY);
             updateDaysInMonth();
             
-            // Add listeners to update days when month/year changes
+            // listeners to update days when month/year changes
             SelectionListener listener = new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {

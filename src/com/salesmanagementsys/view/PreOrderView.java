@@ -76,7 +76,7 @@ public class PreOrderView {
         quantityText.setLayoutData(quantityData);
         quantityText.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW));
         
-        // Add Item button in a separate composite aligned to the right
+        // Item button in a separate composite aligned to the right
         Composite buttonCompAddItem = new Composite(composite, SWT.NONE);
         buttonCompAddItem.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false));
         buttonCompAddItem.setLayout(new GridLayout(1, false));

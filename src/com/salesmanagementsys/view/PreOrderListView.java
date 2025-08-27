@@ -63,7 +63,7 @@ public class PreOrderListView {
 
 
     private void createPreOrderListSection(Composite parent) {
-        // Add search panel at the top
+        // search panel at the top
         Group searchGroup = new Group(composite, SWT.NONE);
         searchGroup.setText("Search Pre-Orders");
         GridLayout searchLayout = new GridLayout(7, false);
@@ -115,7 +115,7 @@ public class PreOrderListView {
         clearBtnData.widthHint = 100;
         clearButton.setLayoutData(clearBtnData);
         
-        // Add the search button listener
+        // search button listener
         searchButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -134,7 +134,7 @@ public class PreOrderListView {
             }
         });
         
-        // Add clear button listener
+        // clear button listener
         clearButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -161,7 +161,7 @@ public class PreOrderListView {
         listGroup.setLayoutData(listData);
         listGroup.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
 
-        // Add item details section
+        // item details section
         itemDetailsGroup = new Group(composite, SWT.NONE);
         itemDetailsGroup.setText("Pre-Order Item Details");
         GridLayout detailsLayout = new GridLayout(1, false);
@@ -198,7 +198,7 @@ public class PreOrderListView {
             column.setWidth(100);
         }
         
-        // Add selection listener to main preOrder table
+        // selection listener to main preOrder table
         preOrderTable.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -256,7 +256,7 @@ public class PreOrderListView {
             }
         });
         
-        // New Edit button
+        // Edit button
         editButton = new Button(buttonComp, SWT.PUSH);
         editButton.setText("Edit Order");
         GridData editData = new GridData(SWT.FILL, SWT.CENTER, false, false);
@@ -278,7 +278,7 @@ public class PreOrderListView {
         });
         
         
-        // New Delete button
+        // Delete button
         deleteButton = new Button(buttonComp, SWT.PUSH);
         deleteButton.setText("Delete Order");
         GridData deleteData = new GridData(SWT.FILL, SWT.CENTER, false, false);
@@ -319,7 +319,7 @@ public class PreOrderListView {
             }
         });
         
-        // New Assign Table button
+        // Assign Table button
      Button assignTableButton = new Button(buttonComp, SWT.PUSH);
      assignTableButton.setText("Assign Table");
      GridData assignTableData = new GridData(SWT.FILL, SWT.CENTER, false, false);
@@ -359,7 +359,7 @@ public class PreOrderListView {
          }
      });
 
-     // Add listeners for the new buttons
+     // listeners for the new buttons
      assignTableButton.addSelectionListener(new SelectionAdapter() {
          @Override
          public void widgetSelected(SelectionEvent e) {
@@ -384,7 +384,7 @@ public class PreOrderListView {
 
     }
     
-    // Add dialog for editing a pre-order
+    // dialog for editing a pre-order
     private void showEditPreOrderDialog(int preOrderId) {
         try {
             PreOrder preOrder = controller.getDbManager().getPreOrderById(preOrderId);
@@ -396,8 +396,6 @@ public class PreOrderListView {
                 dialog.setLayout(new GridLayout(2, false));
                 
                 // TODO: Implement edit form with customer, staff selections and item edits
-                // This would be a complex UI component similar to PreOrderView
-                // For brevity, show a message that this feature is coming soon
                 
                 Label message = new Label(dialog, SWT.CENTER);
                 message.setText("Edit functionality will be implemented in the next version.");
@@ -461,8 +459,7 @@ public class PreOrderListView {
             showMessage("Error retrieving staff data: " + e.getMessage(), SWT.ICON_ERROR);
         }
     }
-    
- // Change this in PreOrderListView
+     
     public void displayPreOrderDetails(java.util.List<DatabaseManager.OrderItemDetail> items) {
         itemDetailsTable.removeAll();
         

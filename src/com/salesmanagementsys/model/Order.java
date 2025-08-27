@@ -7,7 +7,7 @@ public class Order {
     private String orderDate;
     private String paymentMethod;
     private double totalAmount;
-    private String paymentStatus; // New field
+    private String paymentStatus; 
 
     public Order(int id, int customerId, int staffId, String orderDate, String paymentMethod, double totalAmount, String paymentStatus) {
         this.id = id;

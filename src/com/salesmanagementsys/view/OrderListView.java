@@ -65,7 +65,7 @@ public class OrderListView {
     private void createOrderListSection(Composite parent) {
 
     	
-	    // Add search panel at the top
+	    // search panel at the top
 	    Group searchGroup = new Group(composite, SWT.NONE);
 	    searchGroup.setText("Search Orders");
 	    GridLayout searchLayout = new GridLayout(7, false);
@@ -117,7 +117,7 @@ public class OrderListView {
 	    clearBtnData.widthHint = 100;
 	    clearButton.setLayoutData(clearBtnData);
 	    
-	    // Add the search button listener
+	    // search button listener
 	    searchButton.addSelectionListener(new SelectionAdapter() {
 	        @Override
 	        public void widgetSelected(SelectionEvent e) {
@@ -136,7 +136,7 @@ public class OrderListView {
 	        }
 	    });
 	    
-	    // Add clear button listener
+	    // clear button listener
 	    clearButton.addSelectionListener(new SelectionAdapter() {
 	        @Override
 	        public void widgetSelected(SelectionEvent e) {
@@ -199,7 +199,7 @@ public class OrderListView {
             column.setWidth(100);
         }
         
-        // Add selection listener to main order table
+        // listener to main order table
         orderTable.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -257,7 +257,7 @@ public class OrderListView {
             }
         });
         
-        // New Edit button
+        // Edit button
         editButton = new Button(buttonComp, SWT.PUSH);
         editButton.setText("Edit Order");
         GridData editData = new GridData(SWT.FILL, SWT.CENTER, false, false);
@@ -278,7 +278,7 @@ public class OrderListView {
             }
         });
         
-        // New Delete button
+        // Delete button
         deleteButton = new Button(buttonComp, SWT.PUSH);
         deleteButton.setText("Delete Order");
         GridData deleteData = new GridData(SWT.FILL, SWT.CENTER, false, false);
@@ -319,7 +319,7 @@ public class OrderListView {
             }
         });
         
-        // New Assign Table button
+        // Assign Table button
      Button assignTableButton = new Button(buttonComp, SWT.PUSH);
      assignTableButton.setText("Assign Table");
      GridData assignTableData = new GridData(SWT.FILL, SWT.CENTER, false, false);
@@ -359,7 +359,7 @@ public class OrderListView {
          }
      });
 
-     // Add listeners for the new buttons
+     // listeners for the new buttons
      assignTableButton.addSelectionListener(new SelectionAdapter() {
          @Override
          public void widgetSelected(SelectionEvent e) {
@@ -441,7 +441,7 @@ public class OrderListView {
         }
     }
     
-    // Add dialog for editing an order
+    // dialog for editing an order
     private void showEditOrderDialog(int orderId) {
         try {
             Order order = controller.getDbManager().getOrderById(orderId);
@@ -452,9 +452,7 @@ public class OrderListView {
                 dialog.setText("Edit Order");
                 dialog.setLayout(new GridLayout(2, false));
                 
-                // TODO: Implement edit form with customer, staff selections and item edits
-                // This would be a complex UI component similar to OrderView
-                // For brevity, show a message that this feature is coming soon
+                // TODO: Implement edit form with customer, staff selections and item edits                
                 
                 Label message = new Label(dialog, SWT.CENTER);
                 message.setText("Edit functionality will be implemented in the next version.");

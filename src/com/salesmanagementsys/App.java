@@ -18,7 +18,7 @@ public class App {
 	public static void main(String[] args) {
 	    Display display = new Display();
 	    
-	 // Add at the beginning of main method
+	 // At the beginning of main method
 	    try {
 	        File logFile = new File(System.getProperty("user.home") + "/amazingdessertbar-startup.log");
 	        FileWriter fw = new FileWriter(logFile);
@@ -77,7 +77,7 @@ public class App {
 	            ItemController itemController = new ItemController(dbManager);
 	            StockPurchaseController stockPurchaseController = new StockPurchaseController(dbManager);
 	            
-	         // Add the connection code here
+	         // connection code 
 	            customerController.setOrderController(orderController);
 	            customerController.setPreOrderController(preOrderController);
 	            
@@ -115,12 +115,11 @@ public class App {
 	            ReportView reportView = new ReportView(contentArea, reportController);
 	            reportController.setView(reportView);
 	            
-	         // In App.java, add after other view creations
+	         // added after other view creations, Ordering is crucial
 	            TableManagementView tableManagementView = new TableManagementView(contentArea, dbManager);
 
 	            
-	            // Create MainView with the shell and all views
-	         // In App.java, modify the MainView instantiation to add the loggedInStaff parameter:
+	            // Create MainView with the shell and all views	         
 	            MainView mainView = new MainView(mainShell, contentArea, stackLayout,
 	            	    customerView, customerListView,
 	            	    orderView, orderListView,

@@ -8,7 +8,7 @@ public class PreOrder {
     private String collectionDate;
     private String collectionTime;
     private double totalAmount;
-    private String paymentStatus; // New field
+    private String paymentStatus; 
 
     public PreOrder(int id, int customerId, int staffId, String preorderDate, String collectionDate, String collectionTime, double totalAmount, String paymentStatus) {
         this.id = id;

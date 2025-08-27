@@ -36,7 +36,7 @@ public class PreOrderController {
         this.listView = listView;
     }
     
-    // Add method to handle adding items to the pre-order
+    // Method to handle adding items to the pre-order
     // This method is called when the user selects an item and enters a quantity
     public void addItemToPreOrder(String itemText, String quantityText, org.eclipse.swt.widgets.List orderItemsList) {
         if (itemText == null || itemText.isEmpty()) {
@@ -61,7 +61,7 @@ public class PreOrderController {
     }
 
     
-    // Add method to process the pre-order placement
+    // Method to process the pre-order placement
     public void placePreOrder(String customerText, String staffText, String collectionDate, 
                              String collectionTime, String[] orderItems) {
         if (customerText == null || customerText.isEmpty() || customerText.equals("None")) {
@@ -155,7 +155,7 @@ public class PreOrderController {
     }       
     
 
- // Update createPreOrder to accept itemsList
+ // createPreOrder that accepts itemsList
  public void createPreOrder(int customerId, int staffId, String preorderDate, String collectionDate, 
                            String collectionTime, double totalAmount, java.util.List<OrderItem> orderItems) {
      try {
@@ -196,9 +196,8 @@ public class PreOrderController {
                 listView.showMessage("Error updating payment status: " + e.getMessage(), SWT.ICON_ERROR);
             }
         }
-    }
-    
- // Add to PreOrderController
+    }    
+
     public void deletePreOrder(int preOrderId) {
         try {
             // Get the preorder to access customer info for debt adjustment
@@ -238,10 +237,8 @@ public class PreOrderController {
             }
         }
     }
-
-
     
- // In PreOrderController.java
+ 
     public void refreshPreOrderList() {
         if (listView != null) {
             try {
@@ -299,9 +296,8 @@ public class PreOrderController {
         } catch (SQLException e) {
             listView.showMessage("Error searching pre-orders: " + e.getMessage(), SWT.ICON_ERROR);
         }
-    }
-    
- // Add to PreOrderController.java
+    }    
+ 
     public void assignTableToPreOrder(int preOrderId) {
         try {
             // Check if the preorder is already assigned to a table
@@ -349,10 +345,9 @@ public class PreOrderController {
         } catch (SQLException e) {
             listView.showMessage("Error releasing table: " + e.getMessage(), SWT.ICON_ERROR);
         }
-    }
-     
+    }    
     
- // Add to PreOrderController.java
+ 
     public DatabaseManager getDbManager() {
         return dbManager;
     }

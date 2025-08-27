@@ -75,7 +75,7 @@ public class CustomerView {
         mobileText.setLayoutData(mobileData);
         mobileText.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW));
         
-        // Button section with better styling
+        // Button section with styling
         Composite buttonComp = new Composite(composite, SWT.NONE);
         buttonComp.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, true, false, 2, 1));
         buttonComp.setLayout(new GridLayout(1, false));

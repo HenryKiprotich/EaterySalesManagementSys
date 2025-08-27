@@ -96,7 +96,7 @@ public class DatabaseManager {
                 "last_name VARCHAR(100), " +
                 "city VARCHAR(100), " +
                 "mobile_number VARCHAR(20), " +
-        		"debt DECIMAL(10, 2) DEFAULT 0.00)";  // Add this line
+        		"debt DECIMAL(10, 2) DEFAULT 0.00)";  
 
         // Create staff table
         String staffSql = "CREATE TABLE IF NOT EXISTS staff (" +
@@ -108,7 +108,7 @@ public class DatabaseManager {
                 "username VARCHAR(50), " +
                 "password VARCHAR(50))";
 
-     // In the createTables() method, add:
+     // Create job_roles table
         String jobRoleSql = "CREATE TABLE IF NOT EXISTS job_roles (" +
                 "id INT AUTO_INCREMENT PRIMARY KEY, " +
                 "name VARCHAR(50) UNIQUE, " +
@@ -214,8 +214,7 @@ public class DatabaseManager {
             }
         }
     }
-
- // Make sure this method in DatabaseManager.java correctly inserts customer data with debt field
+ 
     public void addCustomer(Customer customer) throws SQLException {
         String sql = "INSERT INTO customers (first_name, last_name, city, mobile_number, debt) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
@@ -260,8 +259,7 @@ public class DatabaseManager {
             pstmt.executeUpdate();
         }
     }
-
-    // Add this to the initializeDatabase() method
+   
     private void addDefaultRoles() throws SQLException {
         // Check if job_roles table is empty
         String countSql = "SELECT COUNT(*) FROM job_roles";
@@ -301,7 +299,7 @@ public class DatabaseManager {
         return staffList;
     }
 
- // Add methods to retrieve job roles
+ // methods to retrieve job roles
     public List<JobRole> getAllJobRoles() throws SQLException {
         List<JobRole> roles = new ArrayList<>();
         String sql = "SELECT * FROM job_roles ORDER BY name";
@@ -380,8 +378,7 @@ public class DatabaseManager {
 
         return orderId;
     }
-
- // Add these methods to DatabaseManager.java
+ 
 
     public List<Order> getAllOrders() throws SQLException {
         List<Order> orders = new ArrayList<>();
@@ -628,7 +625,7 @@ public class DatabaseManager {
         }
     }
 
- // Add these new methods to DatabaseManager:
+ 
     public void addStockPurchase(StockPurchase purchase) throws SQLException {
         String sql = "INSERT INTO stock_purchases (item_name, price, quantity, purchase_date, notes) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
@@ -687,8 +684,7 @@ public class DatabaseManager {
 			pstmt.executeUpdate();
 		}
 	}
-
- // Add to DatabaseManager.java
+ 
     public Order getOrderById(int orderId) throws SQLException {
         String sql = "SELECT * FROM orders WHERE id = ?";
         try (PreparedStatement stmt = connection.prepareStatement(sql)) {
@@ -1102,7 +1098,7 @@ public class DatabaseManager {
         return preOrders;
     }
 
- // Add to DatabaseManager.java
+
     public void createTablesTable() throws SQLException {
         String sql = "CREATE TABLE IF NOT EXISTS tables (" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT, " +

@@ -8,6 +8,7 @@ import org.eclipse.swt.SWT;
 import java.util.ArrayList;
 import java.util.List;
 
+//CustomerController class
 public class CustomerController {
     private CustomerView customerView;
     private CustomerListView customerListView;
@@ -15,13 +16,12 @@ public class CustomerController {
 
     public CustomerController(DatabaseManager dbManager) {        
         this.dbManager = dbManager;
-    }
-    
- // In CustomerController class
+    }    
+ 
     private OrderController orderController;
     private PreOrderController preOrderController;
 
-    // Add setter methods
+    // setter methods
     public void setOrderController(OrderController controller) {
         this.orderController = controller;
     }
@@ -38,7 +38,7 @@ public class CustomerController {
         this.customerListView = view;
     }
     
-    // Add this method to navigate to CustomerView
+    // method to navigate to CustomerView
     public void navigateToCustomerView() {
         // Make CustomerView visible and CustomerListView invisible
         if (customerView != null) {
@@ -49,7 +49,7 @@ public class CustomerController {
         }
     }
 
- // Modify the addCustomer method
+ // addCustomer method
     public void addCustomer(String firstName, String lastName, String city, String mobileNumber) {
         try {
             if (firstName.isEmpty() || lastName.isEmpty()) {
